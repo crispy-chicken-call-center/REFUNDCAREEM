@@ -1,1507 +1,1177 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة اعتراضات الخصم - Crispy Chicken</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    
+    <title>Refund Objection Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #d32f2f;
-            --secondary-color: #f44336;
-            --success-color: #4caf50;
-            --warning-color: #ff9800;
-            --danger-color: #f44336;
-            --info-color: #2196f3;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background-color: #f5f5f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
         }
 
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.5rem;
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.2);
+        }
+
+        header h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            text-align: center;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2rem;
         }
 
         .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
 
-        .stats-card {
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-            border-left: 5px solid;
-            position: relative;
-            overflow: hidden;
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
-        .stats-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            transform: translate(30px, -30px);
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray);
         }
 
-        .stats-card.total {
-            border-left-color: var(--primary-color);
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
         }
 
-        .stats-card.accepted {
-            border-left-color: var(--success-color);
+        .card-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .stats-card.rejected {
-            border-left-color: var(--danger-color);
+        .positive {
+            color: var(--success);
         }
 
-        .stats-card.pending {
-            border-left-color: var(--warning-color);
+        .negative {
+            color: var(--danger);
         }
 
-        .stats-card h2 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 0;
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        .stats-card h5 {
-            color: #666;
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
             font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-            border-radius: 25px;
-            padding: 10px 25px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            background: var(--primary);
+            color: white;
         }
 
         .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
+            background: var(--primary-dark);
         }
 
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            padding: 12px 15px;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(211, 47, 47, 0.25);
-        }
-
-        .table {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .table thead th {
-            background-color: var(--primary-color);
+        .btn-success {
+            background: var(--success);
             color: white;
-            border: none;
-            font-weight: 500;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--light);
+            text-align: left;
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.9rem;
             text-transform: uppercase;
-            font-size: 0.85rem;
             letter-spacing: 0.5px;
         }
 
-        .badge {
-            font-size: 0.75rem;
-            padding: 0.5rem 0.75rem;
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
             border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
         .status-pending {
-            background-color: var(--warning-color);
-            color: white;
+            background: #fef3c7;
+            color: #92400e;
         }
 
-        .status-accepted {
-            background-color: var(--success-color);
-            color: white;
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .status-rejected {
-            background-color: var(--danger-color);
-            color: white;
+            background: #fee2e2;
+            color: #991b1b;
         }
 
-        .status-replied {
-            background-color: var(--info-color);
-            color: white;
+        .status-draft {
+            background: #e0e7ff;
+            color: #3730a3;
         }
 
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 20px;
+        .actions {
+            display: flex;
+            gap: 8px;
         }
 
-        .analysis-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
-        .analysis-card h5 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .analysis-item {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .analysis-item h6 {
-            margin: 0 0 5px 0;
-            font-size: 1rem;
-        }
-
-        .analysis-item p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .progress {
-            height: 8px;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.2);
-        }
-
-        .progress-bar {
-            border-radius: 4px;
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
         }
 
         .modal-header {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 15px 15px 0 0;
-        }
-
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-        }
-
-        .email-output {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            display: none;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: none;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .section-title {
-            color: var(--primary-color);
-            font-weight: bold;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary-color);
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 50px;
-            height: 2px;
-            background: var(--secondary-color);
-        }
-
-        .filter-section {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .export-options {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
             gap: 10px;
-            flex-wrap: wrap;
         }
 
-        .export-options .btn {
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-size: 0.9rem;
+        .close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
         }
 
-        .loading-spinner {
-            display: none;
+        .letter-preview {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .letter-header {
             text-align: center;
-            padding: 20px;
+            margin-bottom: 1.5rem;
         }
 
-        .loading-spinner .spinner-border {
-            width: 3rem;
-            height: 3rem;
-            border-width: 0.3em;
+        .letter-body {
+            white-space: pre-line;
         }
 
-        .reason-tag {
-            display: inline-block;
-            background-color: #e9ecef;
-            color: #495057;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            margin: 2px;
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray);
         }
 
-        .reason-tag.high-frequency {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .reason-tag.medium-frequency {
-            background-color: var(--warning-color);
-            color: white;
-        }
-
-        .trend-indicator {
-            font-size: 0.8rem;
-            margin-left: 5px;
-        }
-
-        .trend-up {
-            color: var(--success-color);
-        }
-
-        .trend-down {
-            color: var(--danger-color);
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
         @media (max-width: 768px) {
-            .stats-card h2 {
-                font-size: 2rem;
+            .form-grid {
+                grid-template-columns: 1fr;
             }
             
-            .export-options {
-                justify-content: center;
+            .search-box {
+                width: 100%;
+            }
+            
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            .actions {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-shield-exclamation"></i> نظام إدارة اعتراضات الخصم
-            </a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text">
-                    <i class="bi bi-building"></i> Crispy Chicken - UAE
-                </span>
-            </div>
-        </div>
-    </nav>
+    <div class="container">
+        <header>
+            <h1>Refund Objection Management System</h1>
+            <p class="header-subtitle">Track, object to, and recover unjustified refunds</p>
+        </header>
 
-    <div class="container-fluid py-4">
-        <!-- Summary Cards -->
-        <div class="row mb-4">
-            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-                <div class="card stats-card total h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="card-title">إجمالي الاعتراضات</h5>
-                                <h2 class="text-primary" id="totalDisputes">0</h2>
-                                <small class="text-muted">
-                                    <span class="trend-indicator trend-up">
-                                        <i class="bi bi-arrow-up"></i> 12% هذا الشهر
-                                    </span>
-                                </small>
-                            </div>
-                            <div class="text-primary">
-                                <i class="bi bi-file-earmark-text fs-1 opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total Refunds</div>
+                    <i class="fas fa-money-bill-wave" style="color: var(--danger);"></i>
+                </div>
+                <div class="card-value" id="totalRefunds">AED 0</div>
+                <div class="card-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>0% from last month</span>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-                <div class="card stats-card accepted h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="card-title">الاعتراضات المقبولة</h5>
-                                <h2 class="text-success" id="acceptedDisputes">0</h2>
-                                <small class="text-muted">
-                                    <span class="trend-indicator trend-up">
-                                        <i class="bi bi-arrow-up"></i> 8% هذا الشهر
-                                    </span>
-                                </small>
-                            </div>
-                            <div class="text-success">
-                                <i class="bi bi-check-circle fs-1 opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Recovered Amount</div>
+                    <i class="fas fa-hand-holding-usd" style="color: var(--success);"></i>
+                </div>
+                <div class="card-value" id="recoveredAmount">AED 0</div>
+                <div class="card-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>0% recovery rate</span>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-                <div class="card stats-card rejected h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="card-title">الاعتراضات المرفوضة</h5>
-                                <h2 class="text-danger" id="rejectedDisputes">0</h2>
-                                <small class="text-muted">
-                                    <span class="trend-indicator trend-down">
-                                        <i class="bi bi-arrow-down"></i> 5% هذا الشهر
-                                    </span>
-                                </small>
-                            </div>
-                            <div class="text-danger">
-                                <i class="bi bi-x-circle fs-1 opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Pending Objections</div>
+                    <i class="fas fa-clock" style="color: var(--warning);"></i>
+                </div>
+                <div class="card-value" id="pendingObjections">0</div>
+                <div class="card-change">
+                    <span>Orders awaiting action</span>
                 </div>
             </div>
-            <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-                <div class="card stats-card pending h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="card-title">قيد المراجعة</h5>
-                                <h2 class="text-warning" id="pendingDisputes">0</h2>
-                                <small class="text-muted">
-                                    <span class="trend-indicator trend-up">
-                                        <i class="bi bi-arrow-up"></i> 3% هذا الشهر
-                                    </span>
-                                </small>
-                            </div>
-                            <div class="text-warning">
-                                <i class="bi bi-clock-history fs-1 opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Success Rate</div>
+                    <i class="fas fa-chart-pie" style="color: var(--primary);"></i>
+                </div>
+                <div class="card-value" id="successRate">0%</div>
+                <div class="card-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Improving</span>
                 </div>
             </div>
         </div>
 
-        <!-- Analysis Section -->
-        <div class="row mb-4">
-            <div class="col-xl-8 mb-3">
-                <div class="card analysis-card">
-                    <div class="card-body">
-                        <h5><i class="bi bi-graph-up"></i> تحليل الأسباب الرئيسية</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="analysis-item">
-                                    <h6>السبب الأكثر شيوعاً</h6>
-                                    <p id="topReason">تحميل...</p>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="analysis-item">
-                                    <h6>متوسط قيمة الاعتراض</h6>
-                                    <p id="avgAmount">تحميل...</p>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-info" role="progressbar" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="analysis-item">
-                                    <h6>نسبة النجاح</h6>
-                                    <p id="successRate">تحميل...</p>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="analysis-item">
-                                    <h6>متوسط وقت الرد</h6>
-                                    <p id="avgResponseTime">تحميل...</p>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('add-order')">
+                <i class="fas fa-plus-circle"></i> Add New Order
             </div>
-            <div class="col-xl-4 mb-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="section-title"><i class="bi bi-tags"></i> الأسباب الشائعة</h5>
-                        <div id="reasonTags">
-                            <!-- سيتم تحميله ديناميكياً -->
-                        </div>
-                    </div>
-                </div>
+            <div class="tab" onclick="switchTab('manage-orders')">
+                <i class="fas fa-list"></i> Manage Orders
+            </div>
+            <div class="tab" onclick="switchTab('generate-letter')">
+                <i class="fas fa-file-alt"></i> Generate Letter
+            </div>
+            <div class="tab" onclick="switchTab('analytics')">
+                <i class="fas fa-chart-bar"></i> Analytics
             </div>
         </div>
 
-        <!-- Charts Row -->
-        <div class="row mb-4">
-            <div class="col-xl-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="bi bi-pie-chart"></i> توزيع الاعتراضات حسب المنطقة
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="areaChart"></canvas>
+        <div id="add-order" class="tab-content active">
+            <div class="form-container">
+                <h2 style="margin-bottom: 1.5rem;">Add New Refund Case</h2>
+                <form id="orderForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="orderNumber">Order Number</label>
+                            <input type="text" class="form-control" id="orderNumber" placeholder="#12345678" required>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="bi bi-bar-chart"></i> الاعتراضات حسب الحالة
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="statusChart"></canvas>
+                        <div class="form-group">
+                            <label for="orderDate">Date</label>
+                            <input type="date" class="form-control" id="orderDate" required>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filter Section -->
-        <div class="filter-section">
-            <h5 class="section-title"><i class="bi bi-funnel"></i> فلترة البيانات</h5>
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">الحالة</label>
-                    <select class="form-select" id="statusFilter">
-                        <option value="">جميع الحالات</option>
-                        <option value="Pending">قيد المراجعة</option>
-                        <option value="Accepted">مقبول</option>
-                        <option value="Rejected">مرفوض</option>
-                        <option value="Replied">تم الرد</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">المنطقة</label>
-                    <select class="form-select" id="areaFilter">
-                        <option value="">جميع المناطق</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">من تاريخ</label>
-                    <input type="date" class="form-control" id="dateFrom">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">إلى تاريخ</label>
-                    <input type="date" class="form-control" id="dateTo">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <button class="btn btn-primary" onclick="applyFilters()">
-                        <i class="bi bi-search"></i> تطبيق الفلترة
-                    </button>
-                    <button class="btn btn-outline-secondary" onclick="resetFilters()">
-                        <i class="bi bi-arrow-clockwise"></i> إعادة تعيين
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Add Dispute Form -->
-            <div class="col-xl-5 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="bi bi-plus-circle"></i> إضافة اعتراض جديد
-                    </div>
-                    <div class="card-body">
-                        <form id="disputeForm">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">رقم الطلب <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="orderId" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">معرف الفرع <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="branchId" required>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">اسم الفرع <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="branchName" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">المنطقة <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="area" required>
-                                        <option value="">اختر المنطقة</option>
-                                        <option value="Al Danah">Al Danah</option>
-                                        <option value="Al Barsha 1">Al Barsha 1</option>
-                                        <option value="Al Markaziyah">Al Markaziyah</option>
-                                        <option value="Al Rawdah">Al Rawdah</option>
-                                        <option value="Al Satwa">Al Satwa</option>
-                                        <option value="Mohammed Bin Zayed City">Mohammed Bin Zayed City</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">إجمالي السلة (درهم) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="basketAmount" step="0.01" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">المبلغ المخصوم (درهم) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control" id="deductedAmount" step="0.01" required>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">سبب الاعتراض <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="disputeReason" rows="3" required 
-                                    placeholder="اشرح سبب الاعتراض بالتفصيل..."></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">الأدلة</label>
-                                <input type="file" class="form-control" id="evidence" multiple accept="image/*,video/*">
-                                <small class="text-muted">يمكنك رفع صور أو فيديوهات كدليل</small>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">ملاحظات إضافية</label>
-                                <textarea class="form-control" id="additionalNotes" rows="2" 
-                                    placeholder="أي ملاحظات إضافية..."></textarea>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-plus-circle"></i> إضافة الاعتراض
-                                </button>
-                            </div>
-                        </form>
-
-                        <div id="emailOutput" class="email-output"></div>
-                        
-                        <div id="successMessage" class="success-message">
-                            <i class="bi bi-check-circle-fill"></i> تم نسخ البريد الإلكتروني إلى الحافظة بنجاح!
+                        <div class="form-group">
+                            <label for="outlet">Outlet</label>
+                            <input type="text" class="form-control" id="outlet" placeholder="Crispy Chicken, Al Danah" required>
                         </div>
-
-                        <div class="text-center mt-3">
-                            <button id="copyButton" class="btn btn-outline-primary" style="display: none;" onclick="copyEmail()">
-                                <i class="bi bi-clipboard"></i> نسخ البريد الإلكتروني
-                            </button>
+                        <div class="form-group">
+                            <label for="product">Product</label>
+                            <input type="text" class="form-control" id="product" placeholder="DAILY OFFER Spicy Meal" required>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Disputes Table -->
-            <div class="col-xl-7 mb-4">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-table"></i> قائمة الاعتراضات</span>
-                        <div class="export-options">
-                            <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()">
-                                <i class="bi bi-file-earmark-excel"></i> Excel
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="exportToPDF()">
-                                <i class="bi bi-file-earmark-pdf"></i> PDF
-                            </button>
-                            <button class="btn btn-outline-primary btn-sm" onclick="exportToCSV()">
-                                <i class="bi bi-file-earmark-text"></i> CSV
-                            </button>
+                        <div class="form-group">
+                            <label for="originalAmount">Original Amount (AED)</label>
+                            <input type="number" class="form-control" id="originalAmount" step="0.01" placeholder="40.00" required>
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="disputesTable">
-                                <thead>
-                                    <tr>
-                                        <th>رقم الطلب</th>
-                                        <th>الفرع</th>
-                                        <th>المنطقة</th>
-                                        <th>المبلغ</th>
-                                        <th>الحالة</th>
-                                        <th>التاريخ</th>
-                                        <th>الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Disputes will be loaded here -->
-                                </tbody>
-                            </table>
-                            <div id="emptyState" class="text-center py-5 text-muted">
-                                <i class="bi bi-inbox fs-1"></i>
-                                <p class="mt-2">لا توجد اعتراضات مسجلة</p>
-                            </div>
-                            <div class="loading-spinner">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">جاري التحميل...</span>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label for="refundAmount">Refund Amount (AED)</label>
+                            <input type="number" class="form-control" id="refundAmount" step="0.01" placeholder="20.00" required>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Dispute Modal -->
-    <div class="modal fade" id="viewDisputeModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">تفاصيل الاعتراض</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="disputeDetails">
-                    <!-- Details will be loaded here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
-                    <button type="button" class="btn btn-primary" onclick="generateEmailFromModal()">
-                        <i class="bi bi-envelope"></i> إنشاء بريد إلكتروني
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Update Status Modal -->
-    <div class="modal fade" id="updateStatusModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">تحديث حالة الاعتراض</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="updateStatusForm">
-                        <div class="mb-3">
-                            <label class="form-label">الحالة الجديدة</label>
-                            <select class="form-select" id="newStatus" required>
-                                <option value="Pending">قيد المراجعة</option>
-                                <option value="Accepted">مقبول</option>
-                                <option value="Rejected">مرفوض</option>
-                                <option value="Replied">تم الرد</option>
+                        <div class="form-group">
+                            <label for="refundReason">Refund Reason</label>
+                            <select class="form-control" id="refundReason" required>
+                                <option value="">Select a reason</option>
+                                <option value="Missing items">Missing items</option>
+                                <option value="Wrong item sent">Wrong item sent</option>
+                                <option value="Instructions not followed">Instructions not followed</option>
+                                <option value="Spilled/damaged">Spilled/damaged</option>
+                                <option value="Undercooked food">Undercooked food</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">ملاحظات الرد</label>
-                            <textarea class="form-control" id="replyNotes" rows="3" 
-                                placeholder="أدخل ملاحظات الرد من Careem..."></textarea>
+                        <div class="form-group">
+                            <label for="customerNotes">Customer Notes</label>
+                            <textarea class="form-control" id="customerNotes" placeholder="Customer complaint details..."></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">تاريخ الرد</label>
-                            <input type="datetime-local" class="form-control" id="replyDate" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="updateDisputeStatus()">
-                        <i class="bi bi-check-circle"></i> تحديث
+                    </div>
+                    <div class="form-group">
+                        <label for="assessment">Case Assessment</label>
+                        <select class="form-control" id="assessment" required>
+                            <option value="">Select assessment</option>
+                            <option value="Unjustified">Unjustified</option>
+                            <option value="Partially justified">Partially justified</option>
+                            <option value="Justified">Justified</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="evidence">Available Evidence</label>
+                        <textarea class="form-control" id="evidence" placeholder="List available evidence (surveillance, inventory records, etc.)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="proposedAction">Proposed Action</label>
+                        <select class="form-control" id="proposedAction" required>
+                            <option value="">Select action</option>
+                            <option value="Full reversal">Full reversal</option>
+                            <option value="Partial adjustment">Partial adjustment</option>
+                            <option value="Accept refund">Accept refund</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Order
                     </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="manage-orders" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>Refund Cases</h2>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search orders..." id="searchInput">
+                    </div>
                 </div>
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date</th>
+                            <th>Outlet</th>
+                            <th>Product</th>
+                            <th>Refund Amount</th>
+                            <th>Reason</th>
+                            <th>Assessment</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No refund cases found. Add your first case to get started.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="generate-letter" class="tab-content">
+            <div class="form-container">
+                <h2 style="margin-bottom: 1.5rem;">Generate Objection Letter</h2>
+                <div class="form-group">
+                    <label for="letterOrder">Select Order</label>
+                    <select class="form-control" id="letterOrder">
+                        <option value="">Select an order</option>
+                    </select>
+                </div>
+                <div class="letter-preview" id="letterPreview">
+                    <div class="letter-header">
+                        <h3>Objection Letter Preview</h3>
+                        <p>Select an order to generate letter preview</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="downloadLetter" disabled>
+                    <i class="fas fa-download"></i> Download Letter
+                </button>
+            </div>
+        </div>
+
+        <div id="analytics" class="tab-content">
+            <div class="form-container">
+                <h2 style="margin-bottom: 1.5rem;">Refund Analytics</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Refund Reasons</div>
+                            <i class="fas fa-list-ul" style="color: var(--primary);"></i>
+                        </div>
+                        <div id="reasonsChart" style="height: 200px; display: flex; align-items: center; justify-content: center; color: var(--gray);">
+                            <p>No data available</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Success by Assessment</div>
+                            <i class="fas fa-chart-pie" style="color: var(--primary);"></i>
+                        </div>
+                        <div id="assessmentChart" style="height: 200px; display: flex; align-items: center; justify-content: center; color: var(--gray);">
+                            <p>No data available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Order</h2>
+                <button class="close" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editOrderId">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="editOrderNumber">Order Number</label>
+                            <input type="text" class="form-control" id="editOrderNumber" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editOrderDate">Date</label>
+                            <input type="date" class="form-control" id="editOrderDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editOutlet">Outlet</label>
+                            <input type="text" class="form-control" id="editOutlet" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProduct">Product</label>
+                            <input type="text" class="form-control" id="editProduct" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editOriginalAmount">Original Amount (AED)</label>
+                            <input type="number" class="form-control" id="editOriginalAmount" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editRefundAmount">Refund Amount (AED)</label>
+                            <input type="number" class="form-control" id="editRefundAmount" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editRefundReason">Refund Reason</label>
+                            <select class="form-control" id="editRefundReason" required>
+                                <option value="Missing items">Missing items</option>
+                                <option value="Wrong item sent">Wrong item sent</option>
+                                <option value="Instructions not followed">Instructions not followed</option>
+                                <option value="Spilled/damaged">Spilled/damaged</option>
+                                <option value="Undercooked food">Undercooked food</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editCustomerNotes">Customer Notes</label>
+                            <textarea class="form-control" id="editCustomerNotes"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAssessment">Case Assessment</label>
+                            <select class="form-control" id="editAssessment" required>
+                                <option value="Unjustified">Unjustified</option>
+                                <option value="Partially justified">Partially justified</option>
+                                <option value="Justified">Justified</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editEvidence">Available Evidence</label>
+                            <textarea class="form-control" id="editEvidence"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProposedAction">Proposed Action</label>
+                            <select class="form-control" id="editProposedAction" required>
+                                <option value="Full reversal">Full reversal</option>
+                                <option value="Partial adjustment">Partial adjustment</option>
+                                <option value="Accept refund">Accept refund</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editStatus">Status</label>
+                            <select class="form-control" id="editStatus" required>
+                                <option value="Draft">Draft</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEditedOrder()">Save Changes</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Global variables
-        let disputes = JSON.parse(localStorage.getItem('disputes')) || [];
-        let dataTable;
-        let areaChart, statusChart;
-        let currentDisputeIndex = -1;
-        let filteredDisputes = [...disputes];
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set default dates
-            const today = new Date();
-            const lastMonth = new Date(today);
-            lastMonth.setMonth(lastMonth.getMonth() - 1);
-            
-            document.getElementById('dateFrom').value = lastMonth.toISOString().split('T')[0];
-            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
-            
-            // Set current date for reply
-            document.getElementById('replyDate').value = new Date().toISOString().slice(0, 16);
-            
-            // Load and display data
+        // Initialize data
+        let orders = JSON.parse(localStorage.getItem('refundOrders')) || [];
+        
+        // DOM elements
+        const orderForm = document.getElementById('orderForm');
+        const ordersTableBody = document.getElementById('ordersTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const letterOrderSelect = document.getElementById('letterOrder');
+        const letterPreview = document.getElementById('letterPreview');
+        const downloadLetterBtn = document.getElementById('downloadLetter');
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOrders();
             updateDashboard();
-            loadDisputesTable();
-            initializeCharts();
-            updateAnalysis();
-            populateFilters();
+            populateLetterOrderSelect();
+            updateAnalytics();
+            
+            // Set today's date as default
+            document.getElementById('orderDate').valueAsDate = new Date();
         });
-
-        // Format date and time
-        function formatDateTime(dateTimeString) {
-            if (!dateTimeString) return '';
-            const date = new Date(dateTimeString);
-            const options = { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-            };
-            return date.toLocaleDateString('ar-EG', options);
-        }
-
-        // Add new dispute
-        document.getElementById('disputeForm').addEventListener('submit', function(e) {
+        
+        // Form submission
+        orderForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
-            // Get form values
-            const dispute = {
-                orderId: document.getElementById('orderId').value,
-                branchId: document.getElementById('branchId').value,
-                branchName: document.getElementById('branchName').value,
-                area: document.getElementById('area').value,
-                basketAmount: parseFloat(document.getElementById('basketAmount').value),
-                deductedAmount: parseFloat(document.getElementById('deductedAmount').value),
-                disputeReason: document.getElementById('disputeReason').value,
-                evidence: document.getElementById('evidence').files.length > 0 ? 
-                    Array.from(document.getElementById('evidence').files).map(f => f.name).join(', ') : '',
-                additionalNotes: document.getElementById('additionalNotes').value,
-                status: 'Pending',
-                submissionDate: new Date().toISOString(),
-                careemReplyDate: '',
-                careemReplyNotes: '',
-                daysSinceReply: 0
+            const newOrder = {
+                id: Date.now(),
+                orderNumber: document.getElementById('orderNumber').value,
+                orderDate: document.getElementById('orderDate').value,
+                outlet: document.getElementById('outlet').value,
+                product: document.getElementById('product').value,
+                originalAmount: parseFloat(document.getElementById('originalAmount').value),
+                refundAmount: parseFloat(document.getElementById('refundAmount').value),
+                refundReason: document.getElementById('refundReason').value,
+                customerNotes: document.getElementById('customerNotes').value,
+                assessment: document.getElementById('assessment').value,
+                evidence: document.getElementById('evidence').value,
+                proposedAction: document.getElementById('proposedAction').value,
+                status: 'Draft',
+                createdAt: new Date().toISOString()
             };
-
-            // Validate form
-            if (!dispute.orderId || !dispute.branchId || !dispute.branchName || 
-                !dispute.area || !dispute.basketAmount || !dispute.deductedAmount || 
-                !dispute.disputeReason) {
-                showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
-                return;
-            }
-
-            // Add to disputes array
-            disputes.push(dispute);
             
-            // Save to localStorage
-            localStorage.setItem('disputes', JSON.stringify(disputes));
-            
-            // Update UI
+            orders.push(newOrder);
+            saveOrders();
+            renderOrders();
             updateDashboard();
-            loadDisputesTable();
-            updateCharts();
-            updateAnalysis();
-            
-            // Generate email
-            generateEmail(dispute);
+            populateLetterOrderSelect();
+            updateAnalytics();
             
             // Reset form
-            document.getElementById('disputeForm').reset();
+            orderForm.reset();
+            document.getElementById('orderDate').valueAsDate = new Date();
             
             // Show success message
-            showToast('تم إضافة الاعتراض بنجاح', 'success');
+            showNotification('Order added successfully!', 'success');
         });
-
-        // Generate email
-        function generateEmail(dispute = null) {
-            if (!dispute) {
-                // Get form values if not passed
-                dispute = {
-                    orderId: document.getElementById('orderId').value,
-                    branchId: document.getElementById('branchId').value,
-                    branchName: document.getElementById('branchName').value,
-                    area: document.getElementById('area').value,
-                    basketAmount: document.getElementById('basketAmount').value,
-                    deductedAmount: document.getElementById('deductedAmount').value,
-                    disputeReason: document.getElementById('disputeReason').value,
-                    evidence: document.getElementById('evidence').files.length > 0 ? 
-                        Array.from(document.getElementById('evidence').files).map(f => f.name).join(', ') : '',
-                    additionalNotes: document.getElementById('additionalNotes').value
-                };
-            }
-
-            const email = `Subject: Dispute of Unjustified Deduction – Order ${dispute.orderId}
-
-Dear Careem Partnership Team,
-
-We are raising a dispute regarding the deduction applied to the following order:
-
-Order ID: ${dispute.orderId}
-Branch: ${dispute.branchName} / ${dispute.area}
-Order Date: ${dispute.submissionDate ? formatDateTime(dispute.submissionDate) : 'N/A'}
-Deducted Amount: AED ${dispute.deductedAmount}
-Basket Amount: AED ${dispute.basketAmount}
-
-According to our internal records and customer confirmations, this order was delivered in full with no missing or damaged items. Therefore, the deduction applied is unjustified and must be reversed.
-
-Dispute Reason:
-${dispute.disputeReason}
-
-${dispute.additionalNotes ? `Additional Notes:
-${dispute.additionalNotes}` : ''}
-
-${dispute.evidence ? `Evidence: ${dispute.evidence}` : ''}
-
-We kindly request:
-• Immediate reimbursement of the deducted amount to our restaurant account.
-• Review of Careem's refund process to ensure restaurant confirmation before applying such deductions in the future.
-
-We look forward to your urgent resolution of this matter.
-
-Sincerely,
-[Your Full Name]
-[Your Position]
-Crispy Chicken - UAE`;
-
-            // Display email
-            document.getElementById('emailOutput').textContent = email;
-            document.getElementById('emailOutput').style.display = 'block';
-            document.getElementById('copyButton').style.display = 'inline-block';
-            
-            // Scroll to email
-            document.getElementById('emailOutput').scrollIntoView({ behavior: 'smooth' });
+        
+        // Save orders to localStorage
+        function saveOrders() {
+            localStorage.setItem('refundOrders', JSON.stringify(orders));
         }
-
-        // Generate email from modal
-        function generateEmailFromModal() {
-            if (currentDisputeIndex >= 0) {
-                generateEmail(disputes[currentDisputeIndex]);
-                
-                // Close modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('viewDisputeModal'));
-                modal.hide();
-            }
-        }
-
-        // Copy email to clipboard
-        function copyEmail() {
-            const emailText = document.getElementById('emailOutput').textContent;
-            
-            navigator.clipboard.writeText(emailText).then(function() {
-                const successMessage = document.getElementById('successMessage');
-                successMessage.style.display = 'block';
-                
-                setTimeout(function() {
-                    successMessage.style.display = 'none';
-                }, 3000);
-            }).catch(function(err) {
-                showToast('فشل نسخ البريد الإلكتروني. يرجى نسخه يدويًا.', 'error');
-            });
-        }
-
-        // Update dashboard statistics
-        function updateDashboard() {
-            const totalDisputes = disputes.length;
-            const acceptedDisputes = disputes.filter(d => d.status === 'Accepted').length;
-            const rejectedDisputes = disputes.filter(d => d.status === 'Rejected').length;
-            const pendingDisputes = disputes.filter(d => d.status === 'Pending').length;
-            
-            document.getElementById('totalDisputes').textContent = totalDisputes;
-            document.getElementById('acceptedDisputes').textContent = acceptedDisputes;
-            document.getElementById('rejectedDisputes').textContent = rejectedDisputes;
-            document.getElementById('pendingDisputes').textContent = pendingDisputes;
-        }
-
-        // Update analysis section
-        function updateAnalysis() {
-            if (disputes.length === 0) return;
-
-            // Top reason analysis
-            const reasonCounts = {};
-            disputes.forEach(d => {
-                const reason = d.disputeReason.substring(0, 50) + '...'; // Truncate for display
-                reasonCounts[reason] = (reasonCounts[reason] || 0) + 1;
-            });
-            
-            const topReason = Object.keys(reasonCounts).reduce((a, b) => 
-                reasonCounts[a] > reasonCounts[b] ? a : b, Object.keys(reasonCounts)[0]);
-            
-            const topReasonCount = reasonCounts[topReason] || 0;
-            const topReasonPercentage = (topReasonCount / disputes.length * 100).toFixed(1);
-            
-            document.getElementById('topReason').textContent = `${topReason} (${topReasonCount} حالة)`;
-            document.querySelector('#topReason').nextElementSibling.querySelector('.progress-bar').style.width = `${topReasonPercentage}%`;
-
-            // Average amount
-            const avgAmount = disputes.reduce((sum, d) => sum + d.deductedAmount, 0) / disputes.length;
-            document.getElementById('avgAmount').textContent = `${avgAmount.toFixed(2)} درهم`;
-            document.querySelector('#avgAmount').nextElementSibling.querySelector('.progress-bar').style.width = `${Math.min(avgAmount / 50 * 100, 100)}%`;
-
-            // Success rate
-            const successRate = (acceptedDisputes / (acceptedDisputes + rejectedDisputes) * 100).toFixed(1);
-            document.getElementById('successRate').textContent = `${successRate}%`;
-            document.querySelector('#successRate').nextElementSibling.querySelector('.progress-bar').style.width = `${successRate}%`;
-
-            // Average response time
-            const repliedDisputes = disputes.filter(d => d.careemReplyDate);
-            const avgResponseTime = repliedDisputes.length > 0 ? 
-                repliedDisputes.reduce((sum, d) => {
-                    const days = Math.floor((new Date(d.careemReplyDate) - new Date(d.submissionDate)) / (1000 * 60 * 60 * 24));
-                    return sum + days;
-                }, 0) / repliedDisputes.length : 0;
-            
-            document.getElementById('avgResponseTime').textContent = `${avgResponseTime.toFixed(1)} أيام`;
-            document.querySelector('#avgResponseTime').nextElementSibling.querySelector('.progress-bar').style.width = `${Math.min(avgResponseTime / 7 * 100, 100)}%`;
-
-            // Update reason tags
-            updateReasonTags();
-        }
-
-        // Update reason tags
-        function updateReasonTags() {
-            const reasonTagsContainer = document.getElementById('reasonTags');
-            reasonTagsContainer.innerHTML = '';
-
-            const reasonCounts = {};
-            disputes.forEach(d => {
-                const reason = d.disputeReason.substring(0, 30) + '...';
-                reasonCounts[reason] = (reasonCounts[reason] || 0) + 1;
-            });
-
-            Object.entries(reasonCounts).forEach(([reason, count]) => {
-                const percentage = (count / disputes.length * 100).toFixed(1);
-                let tagClass = 'reason-tag';
-                
-                if (percentage > 30) tagClass += ' high-frequency';
-                else if (percentage > 15) tagClass += ' medium-frequency';
-
-                const tag = document.createElement('span');
-                tag.className = tagClass;
-                tag.textContent = `${reason} (${count})`;
-                tag.title = `${percentage}% من إجمالي الاعتراضات`;
-                
-                reasonTagsContainer.appendChild(tag);
-            });
-        }
-
-        // Load disputes table
-        function loadDisputesTable() {
-            const tbody = document.querySelector('#disputesTable tbody');
-            const emptyState = document.getElementById('emptyState');
-            const loadingSpinner = document.querySelector('.loading-spinner');
-            
-            // Show loading
-            loadingSpinner.style.display = 'block';
-            emptyState.style.display = 'none';
-            
-            setTimeout(() => {
-                tbody.innerHTML = '';
-                
-                if (filteredDisputes.length === 0) {
-                    emptyState.style.display = 'block';
-                    loadingSpinner.style.display = 'none';
-                    return;
-                }
-                
-                filteredDisputes.forEach((dispute, index) => {
-                    const actualIndex = disputes.indexOf(dispute);
-                    const row = tbody.insertRow();
-                    
-                    // Status badge class
-                    let statusClass = 'status-pending';
-                    if (dispute.status === 'Accepted') statusClass = 'status-accepted';
-                    if (dispute.status === 'Rejected') statusClass = 'status-rejected';
-                    if (dispute.status === 'Replied') statusClass = 'status-replied';
-                    
-                    // Status text
-                    let statusText = 'قيد المراجعة';
-                    if (dispute.status === 'Accepted') statusText = 'مقبول';
-                    if (dispute.status === 'Rejected') statusText = 'مرفوض';
-                    if (dispute.status === 'Replied') statusText = 'تم الرد';
-                    
-                    row.innerHTML = `
-                        <td><strong>${dispute.orderId}</strong></td>
-                        <td>${dispute.branchName}</td>
-                        <td>${dispute.area}</td>
-                        <td>${dispute.deductedAmount} درهم</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>${formatDateTime(dispute.submissionDate)}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary" onclick="viewDispute(${actualIndex})" title="عرض التفاصيل">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-warning" onclick="openUpdateStatusModal(${actualIndex})" title="تحديث الحالة">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteDispute(${actualIndex})" title="حذف">
-                                <i class="bi bi-trash"></i>
-                            </button>
+        
+        // Render orders table
+        function renderOrders(filteredOrders = orders) {
+            if (filteredOrders.length === 0) {
+                ordersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No refund cases found.</p>
                         </td>
-                    `;
-                });
-                
-                // Initialize DataTable if not already initialized
-                if (!dataTable) {
-                    dataTable = $('#disputesTable').DataTable({
-                        pageLength: 10,
-                        language: {
-                            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/ar.json'
-                        },
-                        order: [[5, 'desc']] // Sort by date
-                    });
-                } else {
-                    dataTable.clear();
-                    dataTable.rows.add(filteredDisputes);
-                    dataTable.draw();
-                }
-                
-                loadingSpinner.style.display = 'none';
-            }, 500);
-        }
-
-        // View dispute details
-        function viewDispute(index) {
-            currentDisputeIndex = index;
-            const dispute = disputes[index];
+                    </tr>
+                `;
+                return;
+            }
             
-            const details = document.getElementById('disputeDetails');
-            details.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>رقم الطلب:</strong> ${dispute.orderId}</p>
-                        <p><strong>معرف الفرع:</strong> ${dispute.branchId}</p>
-                        <p><strong>اسم الفرع:</strong> ${dispute.branchName}</p>
-                        <p><strong>المنطقة:</strong> ${dispute.area}</p>
-                        <p><strong>إجمالي السلة:</strong> ${dispute.basketAmount} درهم</p>
-                        <p><strong>المبلغ المخصوم:</strong> ${dispute.deductedAmount} درهم</p>
+            ordersTableBody.innerHTML = filteredOrders.map(order => `
+                <tr>
+                    <td>${order.orderNumber}</td>
+                    <td>${formatDate(order.orderDate)}</td>
+                    <td>${order.outlet}</td>
+                    <td>${order.product}</td>
+                    <td>AED ${order.refundAmount.toFixed(2)}</td>
+                    <td>${order.refundReason}</td>
+                    <td>${order.assessment}</td>
+                    <td><span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span></td>
+                    <td class="actions">
+                        <button class="btn btn-sm btn-primary" onclick="editOrder(${order.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteOrder(${order.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="updateOrderStatus(${order.id}, 'Approved')">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredOrders = orders.filter(order => 
+                order.orderNumber.toLowerCase().includes(searchTerm) ||
+                order.outlet.toLowerCase().includes(searchTerm) ||
+                order.product.toLowerCase().includes(searchTerm) ||
+                order.refundReason.toLowerCase().includes(searchTerm)
+            );
+            renderOrders(filteredOrders);
+        });
+        
+        // Edit order
+        function editOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+            
+            // Populate edit form
+            document.getElementById('editOrderId').value = order.id;
+            document.getElementById('editOrderNumber').value = order.orderNumber;
+            document.getElementById('editOrderDate').value = order.orderDate;
+            document.getElementById('editOutlet').value = order.outlet;
+            document.getElementById('editProduct').value = order.product;
+            document.getElementById('editOriginalAmount').value = order.originalAmount;
+            document.getElementById('editRefundAmount').value = order.refundAmount;
+            document.getElementById('editRefundReason').value = order.refundReason;
+            document.getElementById('editCustomerNotes').value = order.customerNotes;
+            document.getElementById('editAssessment').value = order.assessment;
+            document.getElementById('editEvidence').value = order.evidence;
+            document.getElementById('editProposedAction').value = order.proposedAction;
+            document.getElementById('editStatus').value = order.status;
+            
+            // Show modal
+            document.getElementById('editModal').style.display = 'flex';
+        }
+        
+        // Save edited order
+        function saveEditedOrder() {
+            const id = parseInt(document.getElementById('editOrderId').value);
+            const orderIndex = orders.findIndex(o => o.id === id);
+            
+            if (orderIndex === -1) return;
+            
+            orders[orderIndex] = {
+                ...orders[orderIndex],
+                orderNumber: document.getElementById('editOrderNumber').value,
+                orderDate: document.getElementById('editOrderDate').value,
+                outlet: document.getElementById('editOutlet').value,
+                product: document.getElementById('editProduct').value,
+                originalAmount: parseFloat(document.getElementById('editOriginalAmount').value),
+                refundAmount: parseFloat(document.getElementById('editRefundAmount').value),
+                refundReason: document.getElementById('editRefundReason').value,
+                customerNotes: document.getElementById('editCustomerNotes').value,
+                assessment: document.getElementById('editAssessment').value,
+                evidence: document.getElementById('editEvidence').value,
+                proposedAction: document.getElementById('editProposedAction').value,
+                status: document.getElementById('editStatus').value,
+                updatedAt: new Date().toISOString()
+            };
+            
+            saveOrders();
+            renderOrders();
+            updateDashboard();
+            populateLetterOrderSelect();
+            updateAnalytics();
+            closeModal('editModal');
+            
+            showNotification('Order updated successfully!', 'success');
+        }
+        
+        // Delete order
+        function deleteOrder(id) {
+            if (confirm('Are you sure you want to delete this order?')) {
+                orders = orders.filter(o => o.id !== id);
+                saveOrders();
+                renderOrders();
+                updateDashboard();
+                populateLetterOrderSelect();
+                updateAnalytics();
+                
+                showNotification('Order deleted successfully!', 'success');
+            }
+        }
+        
+        // Update order status
+        function updateOrderStatus(id, status) {
+            const orderIndex = orders.findIndex(o => o.id === id);
+            
+            if (orderIndex === -1) return;
+            
+            orders[orderIndex].status = status;
+            orders[orderIndex].updatedAt = new Date().toISOString();
+            
+            saveOrders();
+            renderOrders();
+            updateDashboard();
+            populateLetterOrderSelect();
+            updateAnalytics();
+            
+            showNotification(`Order status updated to ${status}!`, 'success');
+        }
+        
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Switch tabs
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Populate letter order select
+        function populateLetterOrderSelect() {
+            letterOrderSelect.innerHTML = '<option value="">Select an order</option>';
+            
+            orders.forEach(order => {
+                const option = document.createElement('option');
+                option.value = order.id;
+                option.textContent = `${order.orderNumber} - ${order.outlet}`;
+                letterOrderSelect.appendChild(option);
+            });
+        }
+        
+        // Generate letter preview
+        letterOrderSelect.addEventListener('change', (e) => {
+            const orderId = parseInt(e.target.value);
+            if (!orderId) {
+                letterPreview.innerHTML = `
+                    <div class="letter-header">
+                        <h3>Objection Letter Preview</h3>
+                        <p>Select an order to generate letter preview</p>
                     </div>
-                    <div class="col-md-6">
-                        <p><strong>الحالة:</strong> 
-                            <span class="badge ${dispute.status === 'Accepted' ? 'status-accepted' : 
-                                dispute.status === 'Rejected' ? 'status-rejected' : 
-                                dispute.status === 'Replied' ? 'status-replied' : 'status-pending'}">
-                                ${dispute.status === 'Accepted' ? 'مقبول' : 
-                                dispute.status === 'Rejected' ? 'مرفوض' : 
-                                dispute.status === 'Replied' ? 'تم الرد' : 'قيد المراجعة'}
-                            </span>
-                        </p>
-                        <p><strong>تاريخ التقديم:</strong> ${formatDateTime(dispute.submissionDate)}</p>
-                        <p><strong>تاريخ الرد:</strong> ${dispute.careemReplyDate ? formatDateTime(dispute.careemReplyDate) : 'لم يتم الرد بعد'}</p>
-                        <p><strong>الأيام منذ الرد:</strong> ${dispute.daysSinceReply || 'N/A'}</p>
-                    </div>
+                `;
+                downloadLetterBtn.disabled = true;
+                return;
+            }
+            
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const letterContent = generateLetterContent(order);
+            letterPreview.innerHTML = `
+                <div class="letter-header">
+                    <h3>Objection to Refund - Order ${order.orderNumber}</h3>
+                    <p>${formatDate(new Date())}</p>
                 </div>
-                <div class="mt-3">
-                    <p><strong>سبب الاعتراض:</strong></p>
-                    <div class="alert alert-info">${dispute.disputeReason}</div>
-                </div>
-                ${dispute.evidence ? `
-                <div class="mt-3">
-                    <p><strong>الأدلة:</strong></p>
-                    <div class="alert alert-light">${dispute.evidence}</div>
-                </div>
-                ` : ''}
-                ${dispute.additionalNotes ? `
-                <div class="mt-3">
-                    <p><strong>ملاحظات إضافية:</strong></p>
-                    <div class="alert alert-secondary">${dispute.additionalNotes}</div>
-                </div>
-                ` : ''}
-                ${dispute.careemReplyNotes ? `
-                <div class="mt-3">
-                    <p><strong>ملاحظات الرد:</strong></p>
-                    <div class="alert alert-warning">${dispute.careemReplyNotes}</div>
-                </div>
-                ` : ''}
+                <div class="letter-body">${letterContent}</div>
             `;
             
-            const modal = new bootstrap.Modal(document.getElementById('viewDisputeModal'));
-            modal.show();
+            downloadLetterBtn.disabled = false;
+            downloadLetterBtn.onclick = () => downloadLetter(order, letterContent);
+        });
+        
+        // Generate letter content
+        function generateLetterContent(order) {
+            const isPartial = order.assessment === 'Partially justified';
+            const proposedAmount = isPartial ? (order.refundAmount / 2).toFixed(2) : '0.00';
+            
+            return `To: Platform Support Team
+Subject: Objection to Refund - Order #${order.orderNumber}
+
+Dear Sir/Madam,
+
+We wish to inform you regarding customer order #${order.orderNumber} dated ${formatDate(order.orderDate)}, for which a refund of ${order.refundAmount.toFixed(2)} AED was processed due to "${order.refundReason}".
+
+Customer Notes: "${order.customerNotes}"
+
+After thorough investigation, we found:
+
+1. Supporting Documents:
+   - ${order.evidence || 'Surveillance footage showing correct packing'}
+   - Inventory records proving full quantity
+   - Order screenshot with no special instructions
+
+2. Responsibility Assessment:
+   - Issues attributed to ${order.assessment === 'Unjustified' ? 'customer misunderstanding' : order.assessment === 'Partially justified' ? 'partial restaurant responsibility' : 'restaurant responsibility'}
+   - Actual value of shortage: ${proposedAmount} AED (instead of ${order.refundAmount.toFixed(2)} AED)
+
+3. Request:
+   - ${order.proposedAction === 'Full reversal' ? 'Full reversal of the refund' : order.proposedAction === 'Partial adjustment' ? `Adjust refund to ${proposedAmount} AED` : 'Accept the refund as is'}
+   - ${order.proposedAction === 'Full reversal' || order.proposedAction === 'Partial adjustment' ? `Reimburse the difference (${(order.refundAmount - parseFloat(proposedAmount)).toFixed(2)} AED) to our restaurant account` : ''}
+
+We attach complete evidence in the attachments and request necessary action within 5 business days.
+
+Best regards,
+${order.outlet}
+${formatDate(new Date())}
+Contact: restaurant@example.com`;
         }
-
-        // Open update status modal
-        function openUpdateStatusModal(index) {
-            currentDisputeIndex = index;
-            const dispute = disputes[index];
-            
-            // Set current values
-            document.getElementById('newStatus').value = dispute.status;
-            document.getElementById('replyNotes').value = dispute.careemReplyNotes || '';
-            document.getElementById('replyDate').value = dispute.careemReplyDate ? 
-                new Date(dispute.careemReplyDate).toISOString().slice(0, 16) : 
-                new Date().toISOString().slice(0, 16);
-            
-            const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
-            modal.show();
-        }
-
-        // Update dispute status
-        function updateDisputeStatus() {
-            if (currentDisputeIndex < 0) return;
-            
-            const newStatus = document.getElementById('newStatus').value;
-            const replyNotes = document.getElementById('replyNotes').value;
-            const replyDate = document.getElementById('replyDate').value;
-            
-            // Update dispute
-            disputes[currentDisputeIndex].status = newStatus;
-            disputes[currentDisputeIndex].careemReplyNotes = replyNotes;
-            disputes[currentDisputeIndex].careemReplyDate = replyDate;
-            
-            // Calculate days since reply
-            const submissionDate = new Date(disputes[currentDisputeIndex].submissionDate);
-            const replyDateTime = new Date(replyDate);
-            disputes[currentDisputeIndex].daysSinceReply = Math.floor((replyDateTime - submissionDate) / (1000 * 60 * 60 * 24));
-            
-            // Save to localStorage
-            localStorage.setItem('disputes', JSON.stringify(disputes));
-            
-            // Update UI
-            updateDashboard();
-            loadDisputesTable();
-            updateCharts();
-            updateAnalysis();
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('updateStatusModal'));
-            modal.hide();
-            
-            showToast('تم تحديث حالة الاعتراض بنجاح', 'success');
-        }
-
-        // Delete dispute
-        function deleteDispute(index) {
-            if (confirm('هل أنت متأكد من حذف هذا الاعتراض؟')) {
-                disputes.splice(index, 1);
-                localStorage.setItem('disputes', JSON.stringify(disputes));
-                
-                updateDashboard();
-                loadDisputesTable();
-                updateCharts();
-                updateAnalysis();
-                
-                showToast('تم حذف الاعتراض بنجاح', 'success');
-            }
-        }
-
-        // Initialize charts
-        function initializeCharts() {
-            // Area chart
-            const areaCtx = document.getElementById('areaChart').getContext('2d');
-            areaChart = new Chart(areaCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        data: [],
-                        backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                            '#FF9F40', '#8AC926', '#1982C4', '#6A4C93', '#F15BB5'
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.parsed || 0;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    return `${label}: ${value} (${percentage}%)`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Status chart
-            const statusCtx = document.getElementById('statusChart').getContext('2d');
-            statusChart = new Chart(statusCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['قيد المراجعة', 'مقبول', 'مرفوض', 'تم الرد'],
-                    datasets: [{
-                        label: 'عدد الاعتراضات',
-                        data: [0, 0, 0, 0],
-                        backgroundColor: ['#ffc107', '#28a745', '#dc3545', '#17a2b8'],
-                        borderColor: ['#e0a800', '#1e7e34', '#c82333', '#138496'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1,
-                                font: {
-                                    size: 12
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${context.parsed.y}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            updateCharts();
-        }
-
-        // Update charts
-        function updateCharts() {
-            // Update area chart
-            const areaCounts = {};
-            disputes.forEach(dispute => {
-                areaCounts[dispute.area] = (areaCounts[dispute.area] || 0) + 1;
-            });
-
-            areaChart.data.labels = Object.keys(areaCounts);
-            areaChart.data.datasets[0].data = Object.values(areaCounts);
-            areaChart.update();
-
-            // Update status chart
-            const statusCounts = {
-                pending: disputes.filter(d => d.status === 'Pending').length,
-                accepted: disputes.filter(d => d.status === 'Accepted').length,
-                rejected: disputes.filter(d => d.status === 'Rejected').length,
-                replied: disputes.filter(d => d.status === 'Replied').length
-            };
-
-            statusChart.data.datasets[0].data = [
-                statusCounts.pending,
-                statusCounts.accepted,
-                statusCounts.rejected,
-                statusCounts.replied
-            ];
-            statusChart.update();
-        }
-
-        // Populate filters
-        function populateFilters() {
-            const areaFilter = document.getElementById('areaFilter');
-            const areas = [...new Set(disputes.map(d => d.area))];
-            
-            areas.forEach(area => {
-                const option = document.createElement('option');
-                option.value = area;
-                option.textContent = area;
-                areaFilter.appendChild(option);
-            });
-        }
-
-        // Apply filters
-        function applyFilters() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const areaFilter = document.getElementById('areaFilter').value;
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
-            
-            filteredDisputes = disputes.filter(dispute => {
-                // Status filter
-                if (statusFilter && dispute.status !== statusFilter) return false;
-                
-                // Area filter
-                if (areaFilter && dispute.area !== areaFilter) return false;
-                
-                // Date filter
-                const disputeDate = new Date(dispute.submissionDate).toISOString().split('T')[0];
-                if (dateFrom && disputeDate < dateFrom) return false;
-                if (dateTo && disputeDate > dateTo) return false;
-                
-                return true;
-            });
-            
-            loadDisputesTable();
-            updateAnalysis();
-        }
-
-        // Reset filters
-        function resetFilters() {
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('areaFilter').value = '';
-            document.getElementById('dateFrom').value = '';
-            document.getElementById('dateTo').value = '';
-            
-            filteredDisputes = [...disputes];
-            loadDisputesTable();
-            updateAnalysis();
-        }
-
-        // Export functions
-        function exportToExcel() {
-            exportData('excel');
-        }
-
-        function exportToPDF() {
-            exportData('pdf');
-        }
-
-        function exportToCSV() {
-            exportData('csv');
-        }
-
-        function exportData(format) {
-            // Create CSV content
-            let csv = "Order ID,Branch ID,Branch Name,Area,Basket Amount,Deducted Amount,Dispute Reason,Evidence,Status,Submission Date,Careem Reply Date,Careem Reply Notes\n";
-            
-            filteredDisputes.forEach(dispute => {
-                csv += `"${dispute.orderId}","${dispute.branchId}","${dispute.branchName}","${dispute.area}",${dispute.basketAmount},${dispute.deductedAmount},"${dispute.disputeReason}","${dispute.evidence}","${dispute.status}","${dispute.submissionDate}","${dispute.careemReplyDate}","${dispute.careemReplyNotes}"\n`;
-            });
-            
-            // Create download link
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        
+        // Download letter
+        function downloadLetter(order, content) {
+            const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `disputes_export_${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'xlsx' : format}`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Objection_Letter_${order.orderNumber}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
             
-            showToast(`تم تصدير البيانات بنجاح بصيغة ${format.toUpperCase()}`, 'success');
+            showNotification('Letter downloaded successfully!', 'success');
         }
-
-        // Show toast notification
-        function showToast(message, type = 'info') {
-            const toastContainer = document.createElement('div');
-            toastContainer.style.cssText = `
+        
+        // Update dashboard
+        function updateDashboard() {
+            // Total refunds
+            const totalRefunds = orders.reduce((sum, order) => sum + order.refundAmount, 0);
+            document.getElementById('totalRefunds').textContent = `AED ${totalRefunds.toFixed(2)}`;
+            
+            // Recovered amount (approved full reversals)
+            const recoveredAmount = orders
+                .filter(order => order.status === 'Approved' && order.proposedAction === 'Full reversal')
+                .reduce((sum, order) => sum + order.refundAmount, 0);
+            document.getElementById('recoveredAmount').textContent = `AED ${recoveredAmount.toFixed(2)}`;
+            
+            // Pending objections
+            const pendingObjections = orders.filter(order => order.status === 'Pending').length;
+            document.getElementById('pendingObjections').textContent = pendingObjections;
+            
+            // Success rate
+            const totalCases = orders.length;
+            const successfulCases = orders.filter(order => order.status === 'Approved').length;
+            const successRate = totalCases > 0 ? Math.round((successfulCases / totalCases) * 100) : 0;
+            document.getElementById('successRate').textContent = `${successRate}%`;
+        }
+        
+        // Update analytics
+        function updateAnalytics() {
+            if (orders.length === 0) return;
+            
+            // Refund reasons chart
+            const reasonsCount = {};
+            orders.forEach(order => {
+                reasonsCount[order.refundReason] = (reasonsCount[order.refundReason] || 0) + 1;
+            });
+            
+            const reasonsChart = document.getElementById('reasonsChart');
+            reasonsChart.innerHTML = Object.entries(reasonsCount)
+                .sort((a, b) => b[1] - a[1])
+                .map(([reason, count]) => `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>${reason}</span>
+                        <span>${count} (${Math.round((count / orders.length) * 100)}%)</span>
+                    </div>
+                `).join('');
+            
+            // Assessment chart
+            const assessmentCount = {};
+            orders.forEach(order => {
+                assessmentCount[order.assessment] = (assessmentCount[order.assessment] || 0) + 1;
+            });
+            
+            const assessmentChart = document.getElementById('assessmentChart');
+            assessmentChart.innerHTML = Object.entries(assessmentCount)
+                .map(([assessment, count]) => `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>${assessment}</span>
+                        <span>${count} (${Math.round((count / orders.length) * 100)}%)</span>
+                    </div>
+                `).join('');
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                z-index: 9999;
+                padding: 15px 20px;
+                background: ${type === 'success' ? 'var(--success)' : 'var(--danger)'};
+                color: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
             `;
+            notification.textContent = message;
             
-            const toastId = 'toast-' + Date.now();
-            const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-primary';
+            document.body.appendChild(notification);
             
-            toastContainer.innerHTML = `
-                <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            ${message}
-                        </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(toastContainer);
-            const toastElement = document.getElementById(toastId);
-            const toast = new bootstrap.Toast(toastElement, { autohide: true, delay: 3000 });
-            toast.show();
-            
-            toastElement.addEventListener('hidden.bs.toast', function() {
-                toastContainer.remove();
-            });
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
         }
+        
+        // Format date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+        
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
